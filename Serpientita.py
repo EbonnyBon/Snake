@@ -31,6 +31,8 @@ screen = pg.display.set_mode([window] * 2)
 # Reloj para controlar la velocidad de actualización de los cuadros
 clock = pg.time.Clock()
 
+background = pg.image.load(r"C:\Users\Ebbony G\OneDrive\Documentos\Palmore\Programacion 2\Parcial 2\Snake\rosa.jpg").convert()
+snaki = pg.image.load(r"C:\Users\Ebbony G\OneDrive\Documentos\Palmore\Programacion 2\Parcial 2\Snake\snaki.png").convert_alpha()
 # Bucle principal del juego
 while True:
     # Revisión de los eventos, como el cierre de la ventana
@@ -38,9 +40,15 @@ while True:
         if event.type == pg.QUIT:
             exit()  
     
+    mopos = pg.mouse.get_pos()
+    x = mopos[0]
+    y = mopos [1]
+
     # Rellenar la pantalla con color negro en cada iteración
-    screen.fill("black")
-    
+    screen.blit(background, [0, 0])
+    screen.blit(snaki,[0,0])
+    #snake
+    [pg.draw.rect(screen, 'green', segmentos) for segmentos in segmentos]
     # Actualizar la pantalla 
     pg.display.flip()
     
