@@ -1,54 +1,80 @@
 import pygame as pg
 from random import randrange
+from pygame.locals import *
 
 # Configuración de la ventana del juego
-
 window = 500  # Tamaño de la ventana
-titlesize = 25  # Tamaño de cada tile (ancho/alto de la serpente)
+titlesize = 25  # Tamaño de cada tile (ancho/alto de la serpiente)
 
-# Se calcula el rango de manera que los objetos queden dentro de los límites de la ventana
-rango = (titlesize // 2, window - titlesize // 2) 
-# Función lambda para obtener una posición aleatoria dentro del rango
-getrandomposition = lambda: [randrange(*rango), randrange(*rango)]
+# Se ajusta el rango para que las posiciones sean múltiplos del tamaño del tile
+getrandomposition = lambda: [randrange(0, window, titlesize), randrange(0, window, titlesize)]
 
 # Creación del rectángulo que representa la serpiente
-# pg.Rect([x, y, width, height]) define el rectángulo con posición y tamaño
-# Rectángulo de la serpiente (2 píxeles menos para dar borde)
-serpiente = pg.Rect([0, 0, titlesize - 2, titlesize - 2])  
+serpente = pg.Rect([0, 0, titlesize - 2, titlesize - 2])  
+serpente.center = getrandomposition()  # Colocar en una posición aleatoria
 
-# Colocamos la serpiente en una posición aleatoria
-serpientecentro = getrandomposition()
-
-# Longitud inicial de la serpiente (un tile pq empieza chikita)
+# Longitud inicial de la serpiente
 length = 1
-
 # Lista para almacenar los tiles de la serpiente
-segmentos = [serpiente.copy()]
+segmentos = [serpente.copy()]
+
+# Dirección de movimiento inicial
+sepentedir = (0, 0)
+
+# Tiempo y pasos de tiempo
+time, timestep = 0, 220
+# Crear la comida en una posición aleatoria
+comia = serpente.copy()
+comia.center = getrandomposition()
 
 # Configuración de la ventana de visualización de Pygame
 screen = pg.display.set_mode([window] * 2)
-
 # Reloj para controlar la velocidad de actualización de los cuadros
 clock = pg.time.Clock()
 
-background = pg.image.load(r"C:\Users\Ebbony G\OneDrive\Documentos\Palmore\Programacion 2\Parcial 2\Snake\rosa.jpg").convert()
-snaki = pg.image.load(r"C:\Users\Ebbony G\OneDrive\Documentos\Palmore\Programacion 2\Parcial 2\Snake\snaki.png").convert_alpha()
 # Bucle principal del juego
 while True:
     # Revisión de los eventos, como el cierre de la ventana
     for event in pg.event.get():
         if event.type == pg.QUIT:
             exit()  
-    
-    mopos = pg.mouse.get_pos()
-    x = mopos[0]
-    y = mopos [1]
+        
+        if event.type == pg.KEYDOWN:
+            if event.key == pg.K_w:
+                sepentedir = (0, -titlesize)
+            if event.key == pg.K_s:
+                sepentedir = (0, titlesize)
+            if event.key == pg.K_a:
+                sepentedir = (-titlesize, 0)
+            if event.key == pg.K_d:
+                sepentedir = (titlesize, 0)
 
     # Rellenar la pantalla con color negro en cada iteración
-    screen.blit(background, [0, 0])
-    screen.blit(snaki,[0,0])
-    #snake
-    [pg.draw.rect(screen, 'green', segmentos) for segmentos in segmentos]
+    screen.fill('black')
+    serpentecomiamisma = pg.Rect.collidelist(serpente, segmentos[:-1]) !=-1
+    if serpente.left < 0 or serpente.right > window or serpente.top < 0 or serpente.bottom > window or serpentecomiamisma:
+        serpente.center, comia.center = getrandomposition(),getrandomposition()
+        length, sepentedir = 1, (0,0)
+        segmentos = [serpente.copy()]
+
+    if serpente.center == comia.center:
+        comia.center = getrandomposition()
+        length += 1
+
+    # Dibujar la comida
+    pg.draw.rect(screen, 'red', comia)
+
+    # Dibuja la serpiente (segmentos)
+    [pg.draw.rect(screen, 'green', segmento) for segmento in segmentos]
+
+    # Mover la serpiente
+    timenow = pg.time.get_ticks()
+    if timenow - time > timestep:
+        time = timenow
+        serpente.move_ip(sepentedir)
+        segmentos.append(serpente.copy())
+        segmentos = segmentos[-length:]
+
     # Actualizar la pantalla 
     pg.display.flip()
     
