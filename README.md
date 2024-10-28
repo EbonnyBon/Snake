@@ -42,8 +42,9 @@ pip install pygame
    python nombre_del_archivo.py
    ```
 
-## Verificación de la ruta de la imagen
 
-Antes de ejecutar el juego, asegúrate de que la imagen `comia.png` se encuentra en la ruta especificada en el código. Si no está, el juego podría no funcionar correctamente.
+Sin mas.
 
 ¡Diviértete jugando!
+
+:3
